@@ -24,7 +24,7 @@ function Sidebar() {
                 <Bell  size={30} />
                 <p className="hidden md:flex">Notifications</p>
             </Link>
-            <Link href="/" className="flex items-center text-2xl gap-5">
+            <Link href={`/profile/${session?.user?.username}`} className="flex items-center text-2xl gap-5">
                 <User size={30} />
                 <p className="hidden md:flex">My Profile</p>
             </Link>

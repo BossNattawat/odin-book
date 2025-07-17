@@ -1,6 +1,6 @@
+import Explore from "@/app/components/Explore";
+import Sidebar from "@/app/components/Sidebar";
 import { ReactNode } from "react";
-import Sidebar from "../components/Sidebar";
-import Explore from "../components/Explore";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

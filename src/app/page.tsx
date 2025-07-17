@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -18,16 +18,11 @@ export default function Home() {
     }
   }, [session, status, router]);
 
-  return (
-    <div>
-      <h1>Hello World!</h1>
-      {session && (
-        <div>
-          <h1>{session.user?.displayName}</h1>
-          <h1>{session.user?.username}</h1>
-          <button className="btn btn-soft btn-info" onClick={() => signOut()}>Logout</button>
-        </div>
-      )}
-    </div>
-  );
+  if(status !== "loading") {
+    return (
+      <div className="min-h-screen w-full flex justify-center items-center">
+          <span className="loading loading-ring loading-xl"></span>
+      </div>
+    )
+  }
 }
