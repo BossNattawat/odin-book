@@ -15,6 +15,14 @@ export async function GET(req: Request, { params }: { params: { username: string
                     username: username,
                 },
             },
+            include: {
+                author: {
+                    select: {
+                        username: true,
+                        displayName: true,
+                    },
+                },
+            },
             orderBy: {
                 createdAt: "desc",
             },
