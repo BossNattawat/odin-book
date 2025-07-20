@@ -6,20 +6,21 @@ import { useRouter } from "next/navigation";
 import { Heart, MessageCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Image from "next/image";
 
 interface Author {
-  username: string
-  displayName: string
+  username: string;
+  displayName: string;
 }
 
 interface Post {
-  id: string
-  author: Author
-  authorId: string
-  content: string
-  commentCount: number
-  likeCount: number
-  createdAt: string
+  id: string;
+  author: Author;
+  authorId: string;
+  content: string;
+  commentCount: number;
+  likeCount: number;
+  createdAt: string;
 }
 
 export default function Home() {
@@ -77,10 +78,11 @@ export default function Home() {
           onSubmit={handleCreatePost}
         >
           <div className="flex flex-row gap-2 items-start">
-            <img
+            <Image
               src="/avatar.png"
               alt="profile"
-              width={50}
+              width={40}
+              height={40}
               className="rounded-full"
             />
             <textarea
@@ -106,10 +108,11 @@ export default function Home() {
                 className="flex flex-col gap-y-3 border-b-[1px] border-slate-600 py-3 px-8"
               >
                 <div className="flex gap-3 items-center">
-                  <img
+                  <Image
                     src="/avatar.png"
                     alt="profile"
-                    width={35}
+                    width={40}
+                    height={40}
                     className="rounded-full"
                   />
                   <div className="flex flex-col gap-x-1">

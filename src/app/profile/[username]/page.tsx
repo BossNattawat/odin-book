@@ -7,48 +7,61 @@ import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import Posts from "@/app/components/Posts";
 
+interface Author {
+  username: string
+  displayName: string
+}
+
+interface Post {
+  id: string
+  author: Author
+  authorId: string
+  content: string
+  commentCount: number
+  likeCount: number
+  createdAt: string
+}
+
 function Profile() {
   const { username } = useParams();
   const [userInfo, setUserInfo] = useState<null | any>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [posts, setPosts] = useState<null | any>()
+  const [posts, setPosts] = useState<Post[]>();
   const [activeTab, setActiveTab] = useState<string>("Posts");
 
-  const tabs = [
-    {
-      id: "Posts",
-      label: "Posts",
-      content: <Posts posts={posts} userInfo={userInfo}/>
-    }
-  ]
-
-  
-  function getPosts() {
-    setLoading(true);
-    axios.get(`/api/posts/${username}`)
-    .then((res) => {
-      setPosts(res.data.posts)
-      setLoading(false);
-    })
-    .catch(() => {
-        setError("Failed to fetch posts");
-        setLoading(false);
-    });
-  }
+  // const tabs = [
+  //   {
+  //     id: "Posts",
+  //     label: "Posts",
+  //     content: <Posts posts={posts} />,
+  //   },
+  // ];
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`/api/user/${username}`)
-      .then((res) => {
-        setUserInfo(res.data.user);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to fetch user data");
-        setLoading(false);
-      });
+    try {
+      axios
+        .get(`/api/user/${username}`)
+        .then((res) => {
+          setUserInfo(res.data.user);
+        })
+        .catch(() => {
+          setError("Failed to fetch user data");
+        });
+      axios
+        .get(`/api/posts/${username}`)
+        .then((res) => {
+          setPosts(res.data.posts);
+        })
+        .catch(() => {
+          setError("Failed to fetch posts");
+        });
+    } catch {
+      setError("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
   }, [username]);
 
   if (loading)
@@ -64,17 +77,17 @@ function Profile() {
       </div>
     );
 
-  if (!userInfo) {
+  if (!userInfo && !loading) {
     return (
       <div className="min-h-screen w-[38rem] flex justify-center items-center">
-        <h1>User not found</h1>
+        <h1>{error}</h1>
       </div>
     );
   }
 
   return (
-    <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll p-8">
-      <section className="flex flex-col gap-y-3 mb-8">
+    <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll">
+      <section className="flex flex-col gap-y-3 mb-8 px-8">
         <div>
           <h1 className="text-2xl font-semibold">{userInfo.displayName}</h1>
           <h3 className="text-gray-400">@{userInfo.username}</h3>
@@ -98,18 +111,45 @@ function Profile() {
         </div>
       </section>
 
-      <section className="mb-5">
+      <section className="mb-5 px-8">
         <div className="flex gap-x-5">
-          <button onClick={() => (setActiveTab("Posts"), getPosts())} className={`text-lg text-gray-400 ${activeTab === "Posts" ? "border-b-2 border-slate-200" : "text-gray-100"}`}>
+          <button
+            onClick={() => setActiveTab("Posts")}
+            className={`text-lg text-gray-400 ${
+              activeTab === "Posts"
+                ? "border-b-2 border-slate-200"
+                : "text-gray-100"
+            }`}
+          >
             Posts
           </button>
-          <button onClick={() => setActiveTab("Replies")} className={`text-lg text-gray-400 ${activeTab === "Replies" ? "border-b-2 border-slate-200" : "text-gray-100"}`}>
+          <button
+            onClick={() => setActiveTab("Replies")}
+            className={`text-lg text-gray-400 ${
+              activeTab === "Replies"
+                ? "border-b-2 border-slate-200"
+                : "text-gray-100"
+            }`}
+          >
             Replies
           </button>
-          <button onClick={() => setActiveTab("Likes")} className={`text-lg text-gray-400 ${activeTab === "Likes" ? "border-b-2 border-slate-200" : "text-gray-100"}`}>
+          <button
+            onClick={() => setActiveTab("Likes")}
+            className={`text-lg text-gray-400 ${
+              activeTab === "Likes"
+                ? "border-b-2 border-slate-200"
+                : "text-gray-100"
+            }`}
+          >
             Likes
           </button>
         </div>
+      </section>
+
+      <section>
+        {posts && (
+          <Posts posts={posts}/>
+        )}
       </section>
     </div>
   );

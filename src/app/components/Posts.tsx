@@ -1,18 +1,39 @@
 import React from 'react'
-import Post from './Post'
+import PostComponent from './Post'
 
-function Posts({ posts, userInfo }) {
+interface Author {
+  username: string
+  displayName: string
+}
+
+interface Post {
+  id: string
+  author: Author
+  authorId: string
+  content: string
+  commentCount: number
+  likeCount: number
+  createdAt: string
+}
+
+interface Posts {
+    posts: Post[]
+}
+
+function Posts({ posts } : Posts) {
+
+    console.log(posts);
     
   return (
     <section className='flex flex-col gap-y-8'>
-        {posts.length > 0 ? (
-            <>
-                {posts.map((post) => (
-                    <Post displayname={userInfo.displayName} username={userInfo.username} content={post.content} comments={post.comments} likes={post.likes} />
-                ))}
-            </>
-        ) : (
+        {posts ? (
             <div>
+                {posts.map((post, index) => (
+                    <PostComponent key={index} post={post} />
+                ))}
+            </div>
+        ) : (
+            <div className='p-8 flex justify-center items-center'>
                 <h1 className='text-2xl'>No post yet</h1>
             </div>
         )}
