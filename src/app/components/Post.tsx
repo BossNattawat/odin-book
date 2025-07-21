@@ -1,26 +1,57 @@
+import axios from "axios";
 import { Heart, MessageCircle } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 interface Author {
-  username: string
-  displayName: string
+  username: string;
+  displayName: string;
 }
 
 interface Post {
-  id: string
-  author: Author
-  authorId: string
-  content: string
-  commentCount: number
-  likeCount: number
-  createdAt: string
+  id: string;
+  author: Author;
+  authorId: string;
+  content: string;
+  commentCount: number;
+  likeCount: number;
+  createdAt: string;
 }
 
 interface PostProps {
   post: Post;
+  initiallyLiked?: boolean; // You can pass this from the parent later
 }
 
-function Post({ post } : PostProps) {
+function Post({ post, initiallyLiked = false }: PostProps) {
+  const { data: session } = useSession();
+
+  const [liked, setLiked] = useState<boolean>(initiallyLiked);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+
+  // Sync liked state with initiallyLiked prop
+  useEffect(() => {
+    setLiked(initiallyLiked);
+  }, [initiallyLiked]);
+
+  async function likePost(postId: string) {
+    try {
+      const data = {
+        username: session?.user.username,
+        postId: postId,
+      };
+
+      await axios.post("/api/posts/like", data);
+
+      // Optimistically toggle UI
+      setLiked(!liked);
+      setLikeCount((prev) => prev + (liked ? -1 : 1));
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-y-3 border-b-[1px] border-slate-600 py-3 px-8">
       <div className="flex gap-3 items-center">
@@ -44,8 +75,15 @@ function Post({ post } : PostProps) {
           <li className="flex items-center gap-1 cursor-pointer">
             <MessageCircle size={18} /> {post.commentCount}
           </li>
-          <li className="flex items-center gap-1 cursor-pointer">
-            <Heart size={18} /> {post.likeCount}
+          <li
+            className="flex items-center gap-1 cursor-pointer"
+            onClick={() => likePost(post.id)}
+          >
+            <Heart
+              size={18}
+              className={liked ? "text-red-500 fill-red-500" : ""}
+            />
+            {likeCount}
           </li>
         </ul>
       </div>

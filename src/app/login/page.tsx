@@ -1,8 +1,8 @@
 "use client"
 
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SubmitHandler, useForm } from "react-hook-form"
 import toast from 'react-hot-toast'
 
@@ -15,6 +15,13 @@ function Login() {
 
     const { register, handleSubmit, formState: { errors, isSubmitting }, } = useForm<FormData>()
     const router = useRouter();
+    const { data: session } = useSession();
+    
+    useEffect(() => {
+        if(session) {
+            router.push("/home")
+        }
+    }, [session, router])
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         
