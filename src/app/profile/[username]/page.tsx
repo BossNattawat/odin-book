@@ -28,15 +28,9 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>();
+  const [replies, setReplies] = useState<Post[]>(); // Add replies state
+  const [likedPosts, setLikedPosts] = useState<Post[]>(); // Add liked posts state
   const [activeTab, setActiveTab] = useState<string>("Posts");
-
-  // const tabs = [
-  //   {
-  //     id: "Posts",
-  //     label: "Posts",
-  //     content: <Posts posts={posts} />,
-  //   },
-  // ];
 
   useEffect(() => {
     setLoading(true);
@@ -56,6 +50,24 @@ function Profile() {
         })
         .catch(() => {
           setError("Failed to fetch posts");
+        });
+      // Fetch replies (if you have an endpoint)
+      axios
+        .get(`/api/replies/${username}`)
+        .then((res) => {
+          setReplies(res.data.replies);
+        })
+        .catch(() => {
+          setReplies([]); // fallback empty
+        });
+      // Fetch liked posts
+      axios
+        .get(`/api/posts/like`, { params: { username } })
+        .then((res) => {
+          setLikedPosts(res.data.likedPosts);
+        })
+        .catch(() => {
+          setLikedPosts([]);
         });
     } catch {
       setError("Failed to fetch data");
@@ -147,8 +159,16 @@ function Profile() {
       </section>
 
       <section>
-        {posts && (
-          <Posts posts={posts}/>
+        {activeTab === "Posts" && posts && <Posts posts={posts} />}
+        {activeTab === "Replies" && (
+          replies && replies.length > 0
+            ? <Posts posts={replies} />
+            : <div className="p-8 flex justify-center items-center"><h1 className="text-2xl">No replies yet</h1></div>
+        )}
+        {activeTab === "Likes" && (
+          likedPosts && likedPosts.length > 0
+            ? <Posts posts={likedPosts} />
+            : <div className="p-8 flex justify-center items-center"><h1 className="text-2xl">No liked posts yet</h1></div>
         )}
       </section>
     </div>
