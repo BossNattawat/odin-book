@@ -2,6 +2,7 @@ import axios from "axios";
 import { Heart, MessageCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 interface Author {
@@ -63,7 +64,7 @@ function Post({ post, initiallyLiked = false }: PostProps) {
           className="rounded-full"
         />
         <div className="flex flex-col gap-x-1">
-          <p className="font-semibold">{post.author.displayName}</p>
+          <Link href={`/profile/${post.author.username}`} className="font-semibold">{post.author.displayName}</Link>
           <p className="text-gray-400">@{post.author.username}</p>
         </div>
       </div>

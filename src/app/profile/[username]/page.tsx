@@ -6,20 +6,21 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import Posts from "@/app/components/Posts";
+import { useSession } from "next-auth/react";
 
 interface Author {
-  username: string
-  displayName: string
+  username: string;
+  displayName: string;
 }
 
 interface Post {
-  id: string
-  author: Author
-  authorId: string
-  content: string
-  commentCount: number
-  likeCount: number
-  createdAt: string
+  id: string;
+  author: Author;
+  authorId: string;
+  content: string;
+  commentCount: number;
+  likeCount: number;
+  createdAt: string;
 }
 
 function Profile() {
@@ -31,14 +32,48 @@ function Profile() {
   const [replies, setReplies] = useState<Post[]>(); // Add replies state
   const [likedPosts, setLikedPosts] = useState<Post[]>(); // Add liked posts state
   const [activeTab, setActiveTab] = useState<string>("Posts");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
+  const { data: session, status } = useSession();
+
+  // Function to check if current user is following profile user
+  async function checkIsFollowing(
+    profileUsername: string,
+    currentUsername: string
+  ) {
+    try {
+      const res = await axios.get("/api/user/follow", {
+        params: {
+          followerUsername: currentUsername,
+          followingUsername: profileUsername,
+        },
+      });
+      return res.data.isFollowing;
+    } catch {
+      return false;
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
     try {
       axios
         .get(`/api/user/${username}`)
-        .then((res) => {
+        .then(async (res) => {
           setUserInfo(res.data.user);
+          // Use API to check if following
+          if (
+            session?.user?.username &&
+            session.user.username !== username &&
+            username !== null
+          ) {
+            const isFollowed = await checkIsFollowing(
+              String(username),
+              session.user.username
+            );
+            setIsFollowing(isFollowed);
+          }
         })
         .catch(() => {
           setError("Failed to fetch user data");
@@ -74,7 +109,22 @@ function Profile() {
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, session?.user]);
+
+  async function follow() {
+    try {
+      setFollowLoading(true);
+      const res = await axios.post("/api/user/follow", {
+        followerUsername: session?.user.username,
+        followingUsername: username,
+      });
+      setIsFollowing(res.data.followed);
+    } catch (err) {
+      console.error("Follow error", err);
+    } finally {
+      setFollowLoading(false);
+    }
+  }
 
   if (loading)
     return (
@@ -107,20 +157,31 @@ function Profile() {
         <p className="flex gap-2 items-center text-gray-400">
           <Calendar /> Joined {new Date(userInfo.createdAt).toDateString()}
         </p>
-        <div className="flex gap-x-3">
-          <p className="text-gray-400">
-            <span className="font-bold text-base-content">
-              {userInfo.following.length}
-            </span>{" "}
-            Following
-          </p>
-          <p className="text-gray-400">
-            <span className="font-bold text-base-content">
-              {userInfo.followers.length}
-            </span>{" "}
-            Follower
-          </p>
-        </div>
+        <section className="flex justify-between">
+          <div className="flex gap-x-3">
+            <p className="text-gray-400">
+              <span className="font-bold text-base-content">
+                {userInfo.following.length}
+              </span>{" "}
+              Following
+            </p>
+            <p className="text-gray-400">
+              <span className="font-bold text-base-content">
+                {userInfo.followers.length}
+              </span>{" "}
+              Follower
+            </p>
+          </div>
+          {username !== session?.user.username && status !== "loading" && (
+            <button
+              className={`btn ${isFollowing ? "btn-ghost" : "btn-primary"}`}
+              disabled={followLoading}
+              onClick={follow}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
+            </button>
+          )}
+        </section>
       </section>
 
       <section className="mb-5 px-8">
@@ -160,16 +221,22 @@ function Profile() {
 
       <section>
         {activeTab === "Posts" && posts && <Posts posts={posts} />}
-        {activeTab === "Replies" && (
-          replies && replies.length > 0
-            ? <Posts posts={replies} />
-            : <div className="p-8 flex justify-center items-center"><h1 className="text-2xl">No replies yet</h1></div>
-        )}
-        {activeTab === "Likes" && (
-          likedPosts && likedPosts.length > 0
-            ? <Posts posts={likedPosts} />
-            : <div className="p-8 flex justify-center items-center"><h1 className="text-2xl">No liked posts yet</h1></div>
-        )}
+        {activeTab === "Replies" &&
+          (replies && replies.length > 0 ? (
+            <Posts posts={replies} />
+          ) : (
+            <div className="p-8 flex justify-center items-center">
+              <h1 className="text-2xl">No replies yet</h1>
+            </div>
+          ))}
+        {activeTab === "Likes" &&
+          (likedPosts && likedPosts.length > 0 ? (
+            <Posts posts={likedPosts} />
+          ) : (
+            <div className="p-8 flex justify-center items-center">
+              <h1 className="text-2xl">No liked posts yet</h1>
+            </div>
+          ))}
       </section>
     </div>
   );
