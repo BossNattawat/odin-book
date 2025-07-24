@@ -1,6 +1,7 @@
 "use client"
 
 import { signIn, useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -58,7 +59,7 @@ function Login() {
 
   return (
     <div className='min-h-screen w-full py-24 px-4 flex justify-center items-center'>
-        <div className="flex max-w-md">
+        <div className="flex max-w-md w-[52rem]">
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col bg-base-300 p-8 w-full rounded-md shadow-xs">
                 <h1 className='text-3xl font-semibold text-center'>Login</h1>
                 <div className="flex flex-col mt-5">
@@ -86,8 +87,8 @@ function Login() {
                         </div>
                     )}
                 </div>
-
                 <button type="submit" disabled={isSubmitting} className="btn btn-success text-white my-5">{isSubmitting ? "Loading..." : "Login"}</button>
+                <p className='self-center'>Don&apos;t have an account? <Link className='text-accent underline' href={"/signup"}>Singup</Link></p>
             </form>
         </div>
     </div>

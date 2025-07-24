@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import Link from "next/link";
 
 interface FormData {
   displayName: string;
@@ -67,12 +68,12 @@ function Signup() {
 
   return (
     <div className="min-h-screen w-full py-24 px-4 flex justify-center items-center">
-      <div className="flex max-w-md">
+      <div className="flex max-w-md w-[52rem]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col bg-base-300 p-8 w-full rounded-md shadow-xs"
         >
-          <h1 className="text-3xl font-semibold text-center">Login</h1>
+          <h1 className="text-3xl font-semibold text-center">Signup</h1>
           <div className="flex flex-col mt-5">
             <label htmlFor="name" className="label">
               Display Name:
@@ -218,6 +219,7 @@ function Signup() {
           >
             {isSubmitting ? "Loading..." : "Signup"}
           </button>
+          <p className='self-center'>Already have an account? <Link className='text-accent underline' href={"/login"}>Login</Link></p>
         </form>
       </div>
     </div>
