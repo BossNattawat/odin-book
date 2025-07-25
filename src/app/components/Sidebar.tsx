@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, EllipsisVertical, House, Search, User } from "lucide-react";
+import { Bell, EllipsisVertical, House, User } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 
@@ -15,10 +15,6 @@ function Sidebar() {
         <Link href="/" className="flex items-center text-2xl gap-5">
           <House />
           <p className="hidden md:flex">Home</p>
-        </Link>
-        <Link href="/" className="flex items-center text-2xl gap-5">
-          <Search size={28} />
-          <p className="hidden md:flex">Search</p>
         </Link>
         <Link href="/" className="flex items-center text-2xl gap-5">
           <Bell size={30} />
@@ -35,7 +31,7 @@ function Sidebar() {
       <button className="btn btn-primary rounded-xl w-full text-xl hidden md:flex">
         Post
       </button>
-      <section className="flex gap-3 mt-8 cursor-pointer hover:bg-slate-800 p-2 rounded-md duration-300">
+      <section className="flex gap-3 mt-8 cursor-pointer hover:bg-base-300 p-2 rounded-md duration-300">
         <Image
           src="/avatar.png"
           alt="profile"
