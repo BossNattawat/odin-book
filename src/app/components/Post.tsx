@@ -68,9 +68,9 @@ function Post({ post, initiallyLiked = false }: PostProps) {
           <p className="text-gray-400">@{post.author.username}</p>
         </div>
       </div>
-      <div className="">
+      <Link href={`/profile/${post.author.username}/post/${post.id}`} className="">
         <p className="text-lg">{post.content}</p>
-      </div>
+      </Link>
       <div className="flex">
         <ul className="flex w-full gap-15">
           <li className="flex items-center gap-1 cursor-pointer">
