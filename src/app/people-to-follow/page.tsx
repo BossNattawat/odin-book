@@ -1,41 +1,46 @@
 "use client"
 
-import axios from "axios"
-import { Search } from "lucide-react"
-import { useSession } from "next-auth/react"
-import Image from "next/image"
-import Link from "next/link"
-import { useEffect, useState } from "react"
+import axios from "axios";
+import { Search } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
 interface User {
-  username: string
-  displayName: string
+  username: string;
+  displayName: string;
 }
 
-function Explore() {
+function People() {
   const { data: session, status } = useSession();
-  const [users, setUsers] = useState<User[]>([])
-  const [isFollowingMap, setIsFollowingMap] = useState<{ [key: string]: boolean }>({});
+  const [users, setUsers] = useState<User[]>([]);
+  const [isFollowingMap, setIsFollowingMap] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [loadingMap, setLoadingMap] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     if (!session?.user?.username) return;
 
     async function fetchUsers() {
-      const res = await axios.get("/api/user/user-to-follow", {
+      const res = await axios.get("/api/user/user-to-follow/all", {
         params: { username: session?.user.username },
       });
       setUsers(res.data.users);
 
       const followStatuses = await Promise.all(
         res.data.users.map(async (user: User) => {
-          const status = await checkIsFollowing(user.username, session?.user.username);
+          const status = await checkIsFollowing(
+            user.username,
+            session?.user.username
+          );
           return { username: user.username, isFollowing: status };
         })
       );
 
       const followMap: { [key: string]: boolean } = {};
-      followStatuses.forEach(item => {
+      followStatuses.forEach((item) => {
         followMap[item.username] = item.isFollowing;
       });
 
@@ -45,7 +50,10 @@ function Explore() {
     fetchUsers();
   }, [session]);
 
-  async function checkIsFollowing(profileUsername: string, currentUsername: string) {
+  async function checkIsFollowing(
+    profileUsername: string,
+    currentUsername: string
+  ) {
     try {
       const res = await axios.get("/api/user/follow", {
         params: {
@@ -61,26 +69,26 @@ function Explore() {
 
   async function follow(username: string) {
     try {
-      setLoadingMap(prev => ({ ...prev, [username]: true }));
+      setLoadingMap((prev) => ({ ...prev, [username]: true }));
 
       const res = await axios.post("/api/user/follow", {
         followerUsername: session?.user.username,
         followingUsername: username,
       });
 
-      setIsFollowingMap(prev => ({
+      setIsFollowingMap((prev) => ({
         ...prev,
-        [username]: res.data.followed
+        [username]: res.data.followed,
       }));
     } catch (err) {
       console.error("Follow error", err);
     } finally {
-      setLoadingMap(prev => ({ ...prev, [username]: false }));
+      setLoadingMap((prev) => ({ ...prev, [username]: false }));
     }
   }
 
   return (
-    <aside className="min-h-screen border-l-[1px] border-slate-600 px-8 py-3 min-w-[26rem] hidden xl:flex flex-col gap-8">
+    <div className="h-screen p-5 gap-y-5 w-[38rem] flex flex-col overflow-y-scroll">
       <section>
         <label className="input w-full rounded-xl">
           <Search />
@@ -88,12 +96,10 @@ function Explore() {
         </label>
       </section>
 
-      <section className="p-5 border-[2px] border-slate-600 rounded-xl">
-        <h2 className="text-xl font-medium">People to follow</h2>
+      <section className="">
+        <h2 className="text-2xl font-bold">People to follow</h2>
         <div className="flex flex-col">
-          {users.length > 0 ? (
-            <>
-              {users.map((person, index) => (
+          {users.map((person, index) => (
             <div key={index} className="flex justify-between my-2 gap-3 hover:bg-base-300 p-2 rounded-md duration-300">
               <div className="flex gap-3">
                 <Image src="/avatar.png" alt="profile" width={50} height={50} className="rounded-full" />
@@ -113,17 +119,10 @@ function Explore() {
               )}
             </div>
           ))}
-            </>
-          ) : (
-            <div className="py-5">
-              <h1 className="text-lg">You&apos;ve followed all users!</h1>
-            </div>
-          )}
         </div>
-        <Link href="/people-to-follow" className="text-blue-400">Show more</Link>
       </section>
-    </aside>
+    </div>
   );
 }
 
-export default Explore;
+export default People;
