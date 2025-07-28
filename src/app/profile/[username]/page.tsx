@@ -6,6 +6,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import Posts from "@/app/components/Posts";
+import Comments from "@/app/components/Comments";
 import { useSession } from "next-auth/react";
 
 interface Author {
@@ -23,13 +24,22 @@ interface Post {
   createdAt: string;
 }
 
+interface Comment {
+  id: string;
+  author: Author;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  post: Post
+}
+
 function Profile() {
   const { username } = useParams();
   const [userInfo, setUserInfo] = useState<null | any>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>();
-  const [replies, setReplies] = useState<Post[]>(); // Add replies state
+  const [replies, setReplies] = useState<Comment[]>(); // Add replies state
   const [likedPosts, setLikedPosts] = useState<Post[]>(); // Add liked posts state
   const [activeTab, setActiveTab] = useState<string>("Posts");
   const [isFollowing, setIsFollowing] = useState(false);
@@ -125,6 +135,8 @@ function Profile() {
       setFollowLoading(false);
     }
   }
+
+  console.log(replies);
 
   if (loading)
     return (
@@ -223,7 +235,7 @@ function Profile() {
         {activeTab === "Posts" && posts && <Posts posts={posts} />}
         {activeTab === "Replies" &&
           (replies && replies.length > 0 ? (
-            <Posts posts={replies} />
+            <Comments comment={replies} />
           ) : (
             <div className="p-8 flex justify-center items-center">
               <h1 className="text-2xl">No replies yet</h1>

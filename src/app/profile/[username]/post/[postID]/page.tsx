@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import Comments from "@/app/components/Comments"
 
 interface Author {
   username: string;
@@ -39,6 +40,7 @@ function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [commentContent, setCommentContent] = useState<string>("");
+  const [comments, setComments] = useState<any[]>([]);
 
   useEffect(() => {
     if (!username || !postID) return;
@@ -59,14 +61,12 @@ function PostPage() {
 
         // Optional: fetch like status for current user
         if (session?.user.username) {
-          const likeRes = await axios.get(
-            `/api/posts/is-liked/`, {
-                params: {
-                    username: session.user.username,
-                    postID: postID
-                }
-            }
-          );
+          const likeRes = await axios.get(`/api/posts/is-liked/`, {
+            params: {
+              username: session.user.username,
+              postID: postID,
+            },
+          });
           setLiked(likeRes.data.liked);
         } else {
           setLiked(false);
@@ -77,8 +77,22 @@ function PostPage() {
         setLoading(false);
       }
     };
-
     fetchPost();
+
+    // Fetch comments (replies) for the post
+    axios
+      .get(`/api/replies/`, {
+        params: {
+          postID,
+        },
+      })
+      .then((res) => {
+        setComments(res.data.replies || []);
+      })
+      .catch(() => {
+        setComments([]);
+      });
+
   }, [username, postID, session?.user.username]);
 
   const likePost = async (postId: string) => {
@@ -96,9 +110,6 @@ function PostPage() {
     }
   };
 
-  console.log(post);
-  console.log(liked);
-
   async function handleCreateComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -110,10 +121,11 @@ function PostPage() {
       const data = {
         username: session?.user.username,
         content: commentContent,
+        postId: postID,
       };
 
-      await axios.post("/api/", data);
-      toast.success("Post created successfully");
+      await axios.post("/api/replies", data);
+      toast.success("Reply created successfully");
     } catch {
       toast.error("An error occured! Please try again later");
     }
@@ -134,6 +146,8 @@ function PostPage() {
       </div>
     );
   }
+
+  console.log(comments);
 
   return (
     <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll">
@@ -218,6 +232,9 @@ function PostPage() {
             Post
           </button>
         </form>
+      </section>
+      <section>
+        <Comments comment={comments}/>
       </section>
     </div>
   );
