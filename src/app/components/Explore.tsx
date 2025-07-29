@@ -87,6 +87,18 @@ function Explore() {
     }
   }
 
+  //  function debounce(fn: () => void, delay: number) {
+  //     let timer;
+  //     return function (...args) {
+  //       clearTimeout(timer)
+  //       timer = setTimeout(() => fn.apply(this, args), delay)
+  //     }
+  //   }
+  
+  //   async function handleSearch(username: string) {
+      
+  //   }
+
   return (
     <aside className="min-h-screen border-l-[1px] border-slate-600 px-8 py-3 min-w-[26rem] hidden xl:flex flex-col gap-8">
       <section>

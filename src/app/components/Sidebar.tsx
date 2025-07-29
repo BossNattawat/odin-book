@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, EllipsisVertical, House, User } from "lucide-react";
+import { Atom, Bell, EllipsisVertical, House, User } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 
@@ -10,10 +10,13 @@ function Sidebar() {
 
   return (
     <aside className="min-h-screen border-r-[1px] border-slate-600 px-3 lg:px-8 py-3 flex flex-col items-center md:items-start">
-      <h1 className="text-3xl font-semibold mb-5">X</h1>
+      <Link href={"/home"} className="text-3xl font-semibold mb-6 flex gap-x-2 justify-center items-center">
+        <Atom size={40}/>
+        <span className="hidden md:flex">Atomic</span>
+      </Link>
       <ul className="flex flex-col gap-y-8 mb-8">
         <Link href="/" className="flex items-center text-2xl gap-5">
-          <House />
+          <House size={30} />
           <p className="hidden md:flex">Home</p>
         </Link>
         <Link href="/" className="flex items-center text-2xl gap-5">
