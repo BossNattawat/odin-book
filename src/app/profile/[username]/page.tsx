@@ -136,8 +136,6 @@ function Profile() {
     }
   }
 
-  console.log(replies);
-
   if (loading)
     return (
       <div className="min-h-screen w-[38rem] flex justify-center items-center">

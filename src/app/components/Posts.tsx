@@ -37,7 +37,6 @@ function Posts({ posts } : Posts) {
           params: { username: session.user.username },
         });
         const likedPosts = res.data.likedPosts || [];
-        console.log(likedPosts);
         const ids = new Set<string>(likedPosts.map((p: Post) => p.id));
         setLikedPostIds(ids);
       } catch (err) {
@@ -47,8 +46,6 @@ function Posts({ posts } : Posts) {
 
     fetchLikedPosts();
   }, [session]);
-
-  console.log(likedPostIds);
     
   return (
     <section className='flex flex-col gap-y-8'>

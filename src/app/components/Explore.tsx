@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import axios from "axios";
@@ -5,7 +6,7 @@ import { Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface User {
   username: string;
@@ -19,6 +20,8 @@ function Explore() {
     [key: string]: boolean;
   }>({});
   const [loadingMap, setLoadingMap] = useState<{ [key: string]: boolean }>({});
+  const [results, setResults] = useState<User[]>([]);
+  const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     if (!session?.user?.username) return;
@@ -87,25 +90,84 @@ function Explore() {
     }
   }
 
-  //  function debounce(fn: () => void, delay: number) {
-  //     let timer;
-  //     return function (...args) {
-  //       clearTimeout(timer)
-  //       timer = setTimeout(() => fn.apply(this, args), delay)
-  //     }
-  //   }
-  
-  //   async function handleSearch(username: string) {
-      
-  //   }
+  function debounce<F extends (...args: any[]) => void>(fn: F, delay: number) {
+    let timer: ReturnType<typeof setTimeout>;
+    return function (this: any, ...args: Parameters<F>) {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
+
+  const debouncedSearch = useRef(
+    debounce(async (q: string) => {
+      try {
+        const res = await axios.get(`/api/user/`, {
+          params: { username: q },
+        });
+        setResults(res.data.users);
+      } catch {
+        setResults([]);
+      }
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    if (query.trim()) {
+      debouncedSearch(query);
+    } else {
+      setResults([]);
+    }
+  }, [query, debouncedSearch]);
 
   return (
     <aside className="min-h-screen border-l-[1px] border-slate-600 px-8 py-3 min-w-[26rem] hidden xl:flex flex-col gap-8">
       <section>
         <label className="input w-full rounded-xl">
           <Search />
-          <input type="text" className="grow" placeholder="Search" />
+          <input
+            type="text"
+            className="grow"
+            placeholder="Search"
+            onChange={(e) => setQuery(e.target.value)}
+            value={query}
+          />
         </label>
+
+        {query && (
+          <ul className="absolute z-10 mt-1 w-[352.8px] bg-base-200 border-2 border-slate-600 rounded-xl shadow-lg">
+            {results.length > 0 ? (
+              results.map((user, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between my-2 gap-3 hover:bg-base-300 p-2 rounded-md duration-300"
+                >
+                  <div className="flex gap-3">
+                    <Image
+                      src="/avatar.png"
+                      alt="profile"
+                      width={50}
+                      height={50}
+                      className="rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <Link
+                        href={`/profile/${user.username}`}
+                        className="font-semibold"
+                      >
+                        {user.displayName}
+                      </Link>
+                      <p className="text-gray-400">@{user.username}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <li className="px-4 py-8 text-gray-500 italic flex justify-center">
+                No results found
+              </li>
+            )}
+          </ul>
+        )}
       </section>
 
       <section className="p-5 border-[2px] border-slate-600 rounded-xl">

@@ -147,8 +147,6 @@ function PostPage() {
     );
   }
 
-  console.log(comments);
-
   return (
     <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll">
       <section className="w-full p-3">
