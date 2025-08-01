@@ -206,7 +206,7 @@ function PostPage() {
       </section>
       <section className="flex flex-col mt-5 gap-y-3 border-b-[1px] border-slate-600 py-3 px-8">
         <form
-          className="flex mb-5 gap-x-3 justify-between"
+          className="flex flex-col md:flex-row mb-5 gap-3 justify-between"
           onSubmit={handleCreateComment}
         >
           <div className="flex flex-row gap-2 items-start w-full">
@@ -215,7 +215,7 @@ function PostPage() {
               alt="profile"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full hidden md:flex"
             />
             <textarea
               onChange={(e) => setCommentContent(e.target.value)}
