@@ -4,8 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { content, postId, username } = body;
+    const { content, postId, username } = await req.json();
 
     if (!content || !postId || !username) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
