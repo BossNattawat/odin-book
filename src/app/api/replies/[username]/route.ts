@@ -30,6 +30,7 @@ export async function GET(req: Request, { params }: { params: { username: string
             id: true,
             username: true,
             displayName: true,
+            profilePic: true
           },
         },
         post: {
@@ -39,6 +40,7 @@ export async function GET(req: Request, { params }: { params: { username: string
                 id: true,
                 username: true,
                 displayName: true,
+                profilePic: true
               },
             },
           },

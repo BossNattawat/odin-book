@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 interface Author {
   username: string;
   displayName: string;
+  profilePic: string;
 }
 
 interface Post {
@@ -57,11 +58,11 @@ function Post({ post, initiallyLiked = false }: PostProps) {
     <div className="flex flex-col gap-y-3 border-b-[1px] border-slate-600 py-3 px-8">
       <div className="flex gap-3 items-center">
         <Image
-          src="/avatar.png"
+          src={post.author.profilePic || "/avatar.png"}
           alt="profile"
           width={40}
           height={40}
-          className="rounded-full"
+          className="rounded-full object-cover"
         />
         <div className="flex flex-col gap-x-1">
           <Link href={`/profile/${post.author.username}`} className="font-semibold">{post.author.displayName}</Link>

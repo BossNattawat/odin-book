@@ -59,7 +59,7 @@ function Sidebar() {
       </button>
       <section className="flex gap-3 mt-8 cursor-pointer hover:bg-base-300 p-2 rounded-md duration-300">
         <Image
-          src="/avatar.png"
+          src={session?.user.profilePic || "/avatar.png"}
           alt="profile"
           width={50}
           height={50}

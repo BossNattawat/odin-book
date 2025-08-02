@@ -19,6 +19,7 @@ model User {
   displayName String
   username    String    @unique
   password    String
+  profilePic  String?
 
   posts       Post[]    @relation("UserPosts")
   comments    Comment[]

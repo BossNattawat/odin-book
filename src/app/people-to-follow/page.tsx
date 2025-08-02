@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 interface User {
   username: string;
   displayName: string;
+  profilePic: string
 }
 
 function People() {
@@ -105,7 +106,7 @@ function People() {
           {filteredUsers.map((person, index) => (
             <div key={index} className="flex justify-between my-2 gap-3 hover:bg-base-300 p-2 rounded-md duration-300">
               <div className="flex gap-3">
-                <Image src="/avatar.png" alt="profile" width={50} height={50} className="rounded-full" />
+                <Image src={ person.profilePic || "/avatar.png" } alt="profile" width={50} height={50} className="rounded-full object-cover" />
                 <div className="flex flex-col">
                   <Link href={`/profile/${person.username}`} className="font-semibold">{person.displayName}</Link>
                   <p className="text-gray-400">@{person.username}</p>

@@ -4,6 +4,7 @@ import CommentComponent from './Comment'
 interface Author {
   username: string;
   displayName: string;
+  profilePic: string;
 }
 
 interface Post {

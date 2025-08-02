@@ -37,7 +37,8 @@ const handler = NextAuth({
                     const data = {
                         id: user.id,
                         username: user.username,
-                        displayName: user.displayName
+                        displayName: user.displayName,
+                        profilePic: user.profilePic ?? ""
                     }
 
                     return data
@@ -60,6 +61,7 @@ const handler = NextAuth({
                 session.user.id = token.id;
                 session.user.username = token.username;
                 session.user.displayName = token.displayName;
+                session.user.profilePic = token.profilePic
             }
             return session;
         },
@@ -68,6 +70,7 @@ const handler = NextAuth({
                 token.id = user.id;
                 token.username = user.username;
                 token.displayName = user.displayName;
+                token.profilePic = user.profilePic;
             }
             return token;
         },

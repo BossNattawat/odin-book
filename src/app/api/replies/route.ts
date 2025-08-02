@@ -66,6 +66,7 @@ export async function GET(req: Request) {
             id: true,
             username: true,
             displayName: true,
+            profilePic: true
           },
         },
         post: {
@@ -75,6 +76,7 @@ export async function GET(req: Request) {
                 id: true,
                 username: true,
                 displayName: true,
+                profilePic: true
               },
             },
           },

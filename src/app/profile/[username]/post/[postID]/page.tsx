@@ -168,7 +168,7 @@ function PostPage() {
               alt="profile"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full object-cover"
             />
             <div className="flex flex-col gap-x-1">
               <Link
@@ -211,11 +211,11 @@ function PostPage() {
         >
           <div className="flex flex-row gap-2 items-start w-full">
             <Image
-              src="/avatar.png"
+              src={ session?.user.profilePic || "/avatar.png" }
               alt="profile"
               width={40}
               height={40}
-              className="rounded-full hidden md:flex"
+              className="rounded-full hidden md:flex object-cover"
             />
             <textarea
               onChange={(e) => setCommentContent(e.target.value)}

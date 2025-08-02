@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 interface Author {
   username: string
   displayName: string
+  profilePic: string;
 }
 
 interface Post {

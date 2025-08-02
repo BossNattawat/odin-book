@@ -3,15 +3,18 @@
 
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Calendar } from "lucide-react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Calendar, Camera } from "lucide-react";
 import Posts from "@/app/components/Posts";
 import Comments from "@/app/components/Comments";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface Author {
   username: string;
   displayName: string;
+  profilePic: string;
 }
 
 interface Post {
@@ -30,7 +33,7 @@ interface Comment {
   authorId: string;
   content: string;
   createdAt: string;
-  post: Post
+  post: Post;
 }
 
 function Profile() {
@@ -44,6 +47,8 @@ function Profile() {
   const [activeTab, setActiveTab] = useState<string>("Posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [selectedImg, setSelectedImg] = useState<string | null>(null)
+  const [isUpdatingProfile, setIsUpdatingProfile] =useState<boolean>(false)
 
   const { data: session, status } = useSession();
 
@@ -136,6 +141,39 @@ function Profile() {
     }
   }
 
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    setIsUpdatingProfile(true)
+    const files = e.target.files
+    if (!files || files.length === 0) {
+      return
+    }
+    const file = files[0]
+
+    const reader = new FileReader()
+
+    reader.readAsDataURL(file)
+
+    reader.onload = async () => {
+      const base64Image = reader.result
+      if (typeof base64Image === "string") {
+        setSelectedImg(base64Image)
+        const data = {
+          username: session?.user.username,
+          profilePic: base64Image
+        }
+        try {
+          await axios.post("/api/user/update-profile", data)
+          toast.success("Profile updated successfully")
+        }
+        catch(error: any) {
+          toast.error(error.message)
+        }
+      }
+    }
+
+    setIsUpdatingProfile(false)
+  }
+
   if (loading)
     return (
       <div className="min-h-screen w-[38rem] flex justify-center items-center">
@@ -160,9 +198,26 @@ function Profile() {
   return (
     <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll">
       <section className="flex flex-col gap-y-3 mb-8 px-8">
-        <div>
-          <h1 className="text-2xl font-semibold">{userInfo.displayName}</h1>
-          <h3 className="text-gray-400">@{userInfo.username}</h3>
+        <div className="flex gap-x-3 my-3 items-center">
+          <div className="relative">
+            <Image
+              src={selectedImg || userInfo.profilePic || "/avatar.png"}
+              alt="profile"
+              width={60}
+              height={60}
+              className="rounded-full size-20 object-cover border-4"
+            />
+            {username === session?.user.username && status !== "loading" && 
+              <label htmlFor="avatar-upload" className={`absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200`}>
+                  <Camera className="size-5 text-base-200"/>
+                  <input type="file" id="avatar-upload" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUpdatingProfile}/>
+              </label>
+            }
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold">{userInfo.displayName}</h1>
+            <h3 className="text-gray-400">@{userInfo.username}</h3>
+          </div>
         </div>
         <p className="flex gap-2 items-center text-gray-400">
           <Calendar /> Joined {new Date(userInfo.createdAt).toDateString()}

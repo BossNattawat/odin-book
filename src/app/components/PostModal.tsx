@@ -50,7 +50,7 @@ function PostModal() {
                 alt="profile"
                 width={40}
                 height={40}
-                className="rounded-full"
+                className="rounded-full object-cover"
               />
               <textarea
                 onChange={(e) => setPostContent(e.target.value)}

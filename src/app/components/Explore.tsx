@@ -11,6 +11,7 @@ import { useEffect, useState, useRef } from "react";
 interface User {
   username: string;
   displayName: string;
+  profilePic: string
 }
 
 function Explore() {
@@ -147,7 +148,7 @@ function Explore() {
                       alt="profile"
                       width={50}
                       height={50}
-                      className="rounded-full"
+                      className="rounded-full object-cover"
                     />
                     <div className="flex flex-col">
                       <Link
@@ -182,11 +183,11 @@ function Explore() {
                 >
                   <div className="flex gap-3">
                     <Image
-                      src="/avatar.png"
+                      src={ person.profilePic || "/avatar.png" }
                       alt="profile"
                       width={50}
                       height={50}
-                      className="rounded-full"
+                      className="rounded-full object-cover"
                     />
                     <div className="flex flex-col">
                       <Link

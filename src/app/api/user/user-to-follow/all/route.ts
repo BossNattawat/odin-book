@@ -35,7 +35,8 @@ export async function GET(req: Request) {
     },
     select: {
       username: true,
-      displayName: true
+      displayName: true,
+      profilePic: true
     }
   });
 

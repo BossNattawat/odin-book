@@ -20,6 +20,7 @@ export async function GET(req: Request, { params }: { params: { username: string
                     select: {
                         username: true,
                         displayName: true,
+                        profilePic: true
                     },
                 },
             },

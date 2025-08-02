@@ -11,6 +11,7 @@ import Posts from "../components/Posts";
 interface Author {
   username: string;
   displayName: string;
+  profilePic: string;
 }
 
 interface Post {
@@ -79,11 +80,11 @@ export default function Home() {
         >
           <div className="flex flex-row gap-2 items-start">
             <Image
-              src="/avatar.png"
+              src={session?.user.profilePic || "/avatar.png"}
               alt="profile"
               width={40}
               height={40}
-              className="rounded-full"
+              className="rounded-full object-cover"
             />
             <textarea
               onChange={(e) => setPostContent(e.target.value)}
