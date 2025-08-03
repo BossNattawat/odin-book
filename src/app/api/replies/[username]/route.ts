@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request, { params }: { params: { username: string } }) {
   try {
-    const { username } = params;
+    const { username } = await params;
 
     if (!username) {
       return NextResponse.json({ error: "Username is required" }, { status: 400 });

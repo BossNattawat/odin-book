@@ -2,11 +2,19 @@ import axios from "axios";
 import { X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../store/useAuthStore";
 
 function PostModal() {
   const { data: session } = useSession();
+  const { userData, getUserInfo } = useAuthStore()
+
+  useEffect(() => {
+      if(session?.user) {
+        getUserInfo(session?.user.username)
+      }
+    }, [session?.user, getUserInfo])
 
   const [postContent, setPostContent] = useState<string>("");
 
@@ -46,7 +54,7 @@ function PostModal() {
           >
             <div className="flex flex-row gap-2 items-start">
               <Image
-                src="/avatar.png"
+                src={userData?.profilePic || "/avatar.png"}
                 alt="profile"
                 width={40}
                 height={40}
