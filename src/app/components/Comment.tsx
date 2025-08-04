@@ -33,8 +33,6 @@ interface CommentProps {
 
 function Comment({ comment }: CommentProps) {
 
-  console.log(comment);
-
   return (
     <div className="flex flex-col gap-y-3 border-b-[1px] border-slate-600 py-3 px-8">
       <div className="flex gap-3 items-center">

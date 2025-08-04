@@ -19,6 +19,9 @@ export async function GET(req: Request) {
 
     const user = await prisma.user.findUnique({
       where: { username },
+      omit: {
+        password: true
+      },
     });
 
     if (!user) {
@@ -76,6 +79,9 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({
       where: {
         username,
+      },
+      omit: {
+        password: true
       },
     });
 

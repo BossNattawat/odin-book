@@ -144,7 +144,7 @@ function Explore() {
                 >
                   <div className="flex gap-3">
                     <Image
-                      src="/avatar.png"
+                      src={user.profilePic || "/avatar.png"}
                       alt="profile"
                       width={50}
                       height={50}

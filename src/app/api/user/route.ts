@@ -15,6 +15,9 @@ export async function GET(req: Request) {
                 startsWith: username,
                 mode: 'insensitive',
             }
+        },
+        omit: {
+            password: true
         }
     })
 

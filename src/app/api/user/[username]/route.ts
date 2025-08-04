@@ -14,6 +14,9 @@ export async function GET(req: Request, { params }: { params: { username: string
             where: {
                 username: username
             },
+            omit: {
+                password: true
+            },
             include: {
                 followers: {
                     select: {

@@ -11,6 +11,9 @@ export async function POST(req: Request) {
         const user = prisma.user.findUnique({
             where: {
                 username: username
+            },
+            omit: {
+                password: true
             }
         })
 

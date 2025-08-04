@@ -19,6 +19,9 @@ export async function GET(req: Request) {
     // Find the user by username
     const user = await prisma.user.findUnique({
       where: { username },
+      omit: {
+        password: true
+      },
     });
 
     if (!user) {
@@ -38,6 +41,7 @@ export async function GET(req: Request) {
               select: {
                 username: true,
                 displayName: true,
+                profilePic: true
               },
             },
           },

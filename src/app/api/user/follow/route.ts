@@ -72,10 +72,16 @@ export async function GET(req: Request) {
         }
 
         const follower = await prisma.user.findUnique({
-            where: { username: followerUsername }
+            where: { username: followerUsername },
+            omit: {
+                password: true
+            }
         });
         const following = await prisma.user.findUnique({
-            where: { username: followingUsername }
+            where: { username: followingUsername },
+            omit: {
+                password: true
+            }
         });
 
         if (!follower || !following) {
