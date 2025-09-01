@@ -62,9 +62,6 @@ export async function GET(req: Request) {
       },
       include: {
         author: {
-          omit: {
-            password: true
-          },
           select: {
             id: true,
             username: true,
@@ -75,9 +72,6 @@ export async function GET(req: Request) {
         post: {
           include: {
             author: {
-              omit: {
-                password: true
-              },
               select: {
                 id: true,
                 username: true,

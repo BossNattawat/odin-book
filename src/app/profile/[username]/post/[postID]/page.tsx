@@ -14,6 +14,7 @@ import Comments from "@/app/components/Comments"
 interface Author {
   username: string;
   displayName: string;
+  profilePic: string;
 }
 
 interface Post {
@@ -164,7 +165,7 @@ function PostPage() {
         <div className="flex flex-col gap-y-3 border-b-[1px] border-slate-600 py-3 px-8">
           <div className="flex gap-3 items-center">
             <Image
-              src="/avatar.png"
+              src={post.author.profilePic || "/avatar.png"}
               alt="profile"
               width={40}
               height={40}

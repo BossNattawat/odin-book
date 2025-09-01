@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
 import axios from "axios";
 import { Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import Loading from "../loading";
 
 interface User {
   username: string;
   displayName: string;
-  profilePic: string
+  profilePic: string;
 }
 
 function People() {
@@ -20,7 +21,7 @@ function People() {
     [key: string]: boolean;
   }>({});
   const [loadingMap, setLoadingMap] = useState<{ [key: string]: boolean }>({});
-  const [searchInput, setSearchInput] = useState<string>("")
+  const [searchInput, setSearchInput] = useState<string>("");
 
   useEffect(() => {
     if (!session?.user?.username) return;
@@ -89,42 +90,70 @@ function People() {
     }
   }
 
-  const filteredUsers: User[] = users.filter((user) => user.username.startsWith(searchInput));
+  const filteredUsers: User[] = users.filter((user) =>
+    user.username.startsWith(searchInput)
+  );
 
   return (
     <div className="h-screen p-5 gap-y-5 w-[38rem] flex flex-col overflow-y-scroll">
-      <section>
-        <label className="input w-full rounded-xl">
-          <Search />
-          <input type="text" className="grow" placeholder="Search" onChange={(e) => setSearchInput(e.target.value)} />
-        </label>
-      </section>
+      <Suspense fallback={<Loading />}>
+        <section>
+          <label className="input w-full rounded-xl">
+            <Search />
+            <input
+              type="text"
+              className="grow"
+              placeholder="Search"
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </label>
+        </section>
 
-      <section className="">
-        <h2 className="text-2xl font-bold">People to follow</h2>
-        <div className="flex flex-col">
-          {filteredUsers.map((person, index) => (
-            <div key={index} className="flex justify-between my-2 gap-3 hover:bg-base-300 p-2 rounded-md duration-300">
-              <div className="flex gap-3">
-                <Image src={ person.profilePic || "/avatar.png" } alt="profile" width={50} height={50} className="rounded-full object-cover" />
-                <div className="flex flex-col">
-                  <Link href={`/profile/${person.username}`} className="font-semibold">{person.displayName}</Link>
-                  <p className="text-gray-400">@{person.username}</p>
+        <section className="">
+          <h2 className="text-2xl font-bold">People to follow</h2>
+          <div className="flex flex-col">
+            {filteredUsers.map((person, index) => (
+              <div
+                key={index}
+                className="flex justify-between my-2 gap-3 hover:bg-base-300 p-2 rounded-md duration-300"
+              >
+                <div className="flex gap-3">
+                  <Image
+                    src={person.profilePic || "/avatar.png"}
+                    alt="profile"
+                    width={50}
+                    height={50}
+                    className="rounded-full object-cover"
+                  />
+                  <div className="flex flex-col">
+                    <Link
+                      href={`/profile/${person.username}`}
+                      className="font-semibold"
+                    >
+                      {person.displayName}
+                    </Link>
+                    <p className="text-gray-400">@{person.username}</p>
+                  </div>
                 </div>
+                {person.username !== session?.user.username &&
+                  status !== "loading" && (
+                    <button
+                      className={`btn rounded-xl ${
+                        isFollowingMap[person.username]
+                          ? "btn-ghost"
+                          : "btn-primary"
+                      }`}
+                      disabled={loadingMap[person.username]}
+                      onClick={() => follow(person.username)}
+                    >
+                      {isFollowingMap[person.username] ? "Unfollow" : "Follow"}
+                    </button>
+                  )}
               </div>
-              {person.username !== session?.user.username && status !== "loading" && (
-                <button
-                  className={`btn rounded-xl ${isFollowingMap[person.username] ? "btn-ghost" : "btn-primary"}`}
-                  disabled={loadingMap[person.username]}
-                  onClick={() => follow(person.username)}
-                >
-                  {isFollowingMap[person.username] ? "Unfollow" : "Follow"}
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </Suspense>
     </div>
   );
 }

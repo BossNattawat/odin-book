@@ -3,13 +3,15 @@
 
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Suspense, useEffect, useState } from "react";
 import { Calendar, Camera } from "lucide-react";
 import Posts from "@/app/components/Posts";
 import Comments from "@/app/components/Comments";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import Loading from "./loading";
+import EditModal from "@/app/components/EditModal";
 
 interface Author {
   username: string;
@@ -47,8 +49,8 @@ function Profile() {
   const [activeTab, setActiveTab] = useState<string>("Posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
-  const [selectedImg, setSelectedImg] = useState<string | null>(null)
-  const [isUpdatingProfile, setIsUpdatingProfile] =useState<boolean>(false)
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
 
   const { data: session, status } = useSession();
 
@@ -142,37 +144,36 @@ function Profile() {
   }
 
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    setIsUpdatingProfile(true)
-    const files = e.target.files
+    setIsUpdatingProfile(true);
+    const files = e.target.files;
     if (!files || files.length === 0) {
-      return
+      return;
     }
-    const file = files[0]
+    const file = files[0];
 
-    const reader = new FileReader()
+    const reader = new FileReader();
 
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(file);
 
     reader.onload = async () => {
-      const base64Image = reader.result
+      const base64Image = reader.result;
       if (typeof base64Image === "string") {
-        setSelectedImg(base64Image)
+        setSelectedImg(base64Image);
         const data = {
           username: session?.user.username,
-          profilePic: base64Image
-        }
+          profilePic: base64Image,
+        };
         try {
-          await axios.post("/api/user/update-profile", data)
-          toast.success("Profile updated successfully")
-        }
-        catch(error: any) {
-          toast.error(error.message)
+          await axios.post("/api/user/update-profile", data);
+          toast.success("Profile updated successfully");
+        } catch (error: any) {
+          toast.error(error.message);
         }
       }
-    }
+    };
 
-    setIsUpdatingProfile(false)
-  }
+    setIsUpdatingProfile(false);
+  };
 
   if (loading)
     return (
@@ -197,112 +198,143 @@ function Profile() {
 
   return (
     <div className="h-screen py-3 w-[38rem] flex flex-col overflow-y-scroll">
-      <section className="flex flex-col gap-y-3 mb-8 px-8">
-        <div className="flex gap-x-3 my-3 items-center">
-          <div className="relative">
-            <Image
-              src={selectedImg || userInfo.profilePic || "/avatar.png"}
-              alt="profile"
-              width={60}
-              height={60}
-              className="rounded-full size-20 object-cover border-4"
-            />
-            {username === session?.user.username && status !== "loading" && 
-              <label htmlFor="avatar-upload" className={`absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200`}>
-                  <Camera className="size-5 text-base-200"/>
-                  <input type="file" id="avatar-upload" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUpdatingProfile}/>
-              </label>
-            }
+      <Suspense fallback={<Loading />}>
+        <section className="flex flex-col gap-y-3 mb-8 px-8">
+          <div className="flex flex-col gap-x-3 items-center">
+            <div className="relative self-start">
+              <Image
+                src={selectedImg || userInfo.profilePic || "/avatar.png"}
+                alt="profile"
+                width={60}
+                height={60}
+                className="rounded-full size-20 object-cover border-4"
+              />
+              {username === session?.user.username && status !== "loading" && (
+                <label
+                  htmlFor="avatar-upload"
+                  className={`absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200`}
+                >
+                  <Camera className="size-5 text-base-200" />
+                  <input
+                    type="file"
+                    id="avatar-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUpdatingProfile}
+                  />
+                </label>
+              )}
+            </div>
+            <div className="flex w-full justify-between mt-3">
+              <div>
+                <h1 className="md:text-2xl font-semibold">
+                  {userInfo.displayName}
+                </h1>
+                <h3 className="text-gray-400">@{userInfo.username}</h3>
+              </div>
+              {username === session?.user.username && (
+                <button
+                  onClick={() =>
+                    (
+                      document.getElementById(
+                        "my_modal_4"
+                      ) as HTMLDialogElement | null
+                    )?.showModal?.()
+                  }
+                  className="btn btn-primary"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-semibold">{userInfo.displayName}</h1>
-            <h3 className="text-gray-400">@{userInfo.username}</h3>
-          </div>
-        </div>
-        <p className="flex gap-2 items-center text-gray-400">
-          <Calendar /> Joined {new Date(userInfo.createdAt).toDateString()}
-        </p>
-        <section className="flex justify-between">
-          <div className="flex gap-x-3">
-            <p className="text-gray-400">
-              <span className="font-bold text-base-content">
-                {userInfo.following.length}
-              </span>{" "}
-              Following
-            </p>
-            <p className="text-gray-400">
-              <span className="font-bold text-base-content">
-                {userInfo.followers.length}
-              </span>{" "}
-              Follower
-            </p>
-          </div>
-          {username !== session?.user.username && status !== "loading" && (
-            <button
-              className={`btn ${isFollowing ? "btn-ghost" : "btn-primary"}`}
-              disabled={followLoading}
-              onClick={follow}
-            >
-              {isFollowing ? "Unfollow" : "Follow"}
-            </button>
-          )}
+          <p className="flex gap-2 items-center text-gray-400">
+            <Calendar /> Joined {new Date(userInfo.createdAt).toDateString()}
+          </p>
+          <section className="flex justify-between">
+            <div className="flex gap-x-3">
+              <p className="text-gray-400">
+                <span className="font-bold text-base-content">
+                  {userInfo.following.length}
+                </span>{" "}
+                Following
+              </p>
+              <p className="text-gray-400">
+                <span className="font-bold text-base-content">
+                  {userInfo.followers.length}
+                </span>{" "}
+                Follower
+              </p>
+            </div>
+            {username !== session?.user.username && status !== "loading" && (
+              <button
+                className={`btn ${isFollowing ? "btn-ghost" : "btn-primary"}`}
+                disabled={followLoading}
+                onClick={follow}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </button>
+            )}
+          </section>
         </section>
-      </section>
 
-      <section className="mb-5 px-8">
-        <div className="flex gap-x-5">
-          <button
-            onClick={() => setActiveTab("Posts")}
-            className={`text-lg text-gray-400 ${
-              activeTab === "Posts"
-                ? "border-b-2 border-slate-200"
-                : "text-gray-100"
-            }`}
-          >
-            Posts
-          </button>
-          <button
-            onClick={() => setActiveTab("Replies")}
-            className={`text-lg text-gray-400 ${
-              activeTab === "Replies"
-                ? "border-b-2 border-slate-200"
-                : "text-gray-100"
-            }`}
-          >
-            Replies
-          </button>
-          <button
-            onClick={() => setActiveTab("Likes")}
-            className={`text-lg text-gray-400 ${
-              activeTab === "Likes"
-                ? "border-b-2 border-slate-200"
-                : "text-gray-100"
-            }`}
-          >
-            Likes
-          </button>
-        </div>
-      </section>
+        <section className="mb-5 px-8">
+          <div className="flex gap-x-5">
+            <button
+              onClick={() => setActiveTab("Posts")}
+              className={`text-lg text-gray-400 ${
+                activeTab === "Posts"
+                  ? "border-b-2 border-slate-200"
+                  : "text-gray-100"
+              }`}
+            >
+              Posts
+            </button>
+            <button
+              onClick={() => setActiveTab("Replies")}
+              className={`text-lg text-gray-400 ${
+                activeTab === "Replies"
+                  ? "border-b-2 border-slate-200"
+                  : "text-gray-100"
+              }`}
+            >
+              Replies
+            </button>
+            <button
+              onClick={() => setActiveTab("Likes")}
+              className={`text-lg text-gray-400 ${
+                activeTab === "Likes"
+                  ? "border-b-2 border-slate-200"
+                  : "text-gray-100"
+              }`}
+            >
+              Likes
+            </button>
+          </div>
+        </section>
 
-      <section>
-        {activeTab === "Posts" && posts && <Posts posts={posts} />}
-        {activeTab === "Replies" &&
-          (replies && replies.length > 0 ? (
-            <Comments comment={replies} />
-          ) : (
-            <div className="p-8 flex justify-center items-center">
-              <h1 className="text-2xl">No replies yet</h1>
-            </div>
-          ))}
-        {activeTab === "Likes" &&
-          (likedPosts && likedPosts.length > 0 ? (
-            <Posts posts={likedPosts} />
-          ) : (
-            <div className="p-8 flex justify-center items-center">
-              <h1 className="text-2xl">No liked posts yet</h1>
-            </div>
-          ))}
-      </section>
+        <section>
+          {activeTab === "Posts" && posts && <Posts posts={posts} />}
+          {activeTab === "Replies" &&
+            (replies && replies.length > 0 ? (
+              <Comments comment={replies} />
+            ) : (
+              <div className="p-8 flex justify-center items-center">
+                <h1 className="text-2xl">No replies yet</h1>
+              </div>
+            ))}
+          {activeTab === "Likes" &&
+            (likedPosts && likedPosts.length > 0 ? (
+              <Posts posts={likedPosts} />
+            ) : (
+              <div className="p-8 flex justify-center items-center">
+                <h1 className="text-2xl">No liked posts yet</h1>
+              </div>
+            ))}
+        </section>
+      </Suspense>
+      <EditModal/>
     </div>
   );
 }
