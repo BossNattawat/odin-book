@@ -20,12 +20,12 @@ export async function GET(req: Request, { params }: { params: { username: string
             include: {
                 followers: {
                     select: {
-                        follower: true, // Get the follower user details (can choose what fields to select)
+                        follower: true,
                     },
                 },
                 following: {
                     select: {
-                        following: true, // Get the following user details (can choose what fields to select)
+                        following: true,
                     },
                 },
             }

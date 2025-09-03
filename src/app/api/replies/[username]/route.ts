@@ -9,7 +9,6 @@ export async function GET(req: Request, { params }: { params: { username: string
       return NextResponse.json({ error: "Username is required" }, { status: 400 });
     }
 
-    // Find the user by username
     const user = await prisma.user.findUnique({
       where: { username },
       select: { id: true },
@@ -19,7 +18,6 @@ export async function GET(req: Request, { params }: { params: { username: string
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Find all comments (replies) made by the user, including the original post
     const replies = await prisma.comment.findMany({
       where: {
         authorId: user.id,

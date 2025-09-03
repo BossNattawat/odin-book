@@ -33,7 +33,6 @@ function Posts({ posts } : Posts) {
       if (!session?.user.username) return;
 
       try {
-        // Pass username as query param
         const res = await axios.get("/api/posts/like", {
           params: { username: session.user.username },
         });

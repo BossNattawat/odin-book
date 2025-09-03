@@ -32,7 +32,6 @@ export async function POST(req: Request) {
         });
 
         if (alreadyFollowing) {
-            // Unfollow
             await prisma.follow.delete({
                 where: {
                     followerId_followingId: {
@@ -52,7 +51,6 @@ export async function POST(req: Request) {
             },
         });
 
-        // Return response after following
         return NextResponse.json({ message: "Followed successfully", followed: true }, { status: 200 });
     }
     catch (error: any) {
@@ -60,7 +58,6 @@ export async function POST(req: Request) {
     }
 }
 
-// Add GET handler to check following status
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);

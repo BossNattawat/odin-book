@@ -25,7 +25,6 @@ model User {
   comments    Comment[]
   likes       Like[]
 
-  // Self-relation for follow
   following   Follow[]  @relation("Following")
   followers   Follow[]  @relation("Followers")
 
@@ -74,7 +73,7 @@ model Like {
 
   createdAt DateTime @default(now())
 
-  @@unique([userId, postId]) // Prevent duplicate likes
+  @@unique([userId, postId])
 }
 
 model Follow {
@@ -86,5 +85,5 @@ model Follow {
   following    User     @relation("Followers", fields: [followingId], references: [id])
   followingId  String
 
-  @@unique([followerId, followingId]) // Prevent duplicate follows
+  @@unique([followerId, followingId])
 }

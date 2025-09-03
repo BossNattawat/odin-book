@@ -9,7 +9,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
-  // Find current user
   const currentUser = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -26,11 +25,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // Query users not followed yet and not the current user
   const suggestedUsers = await prisma.user.findMany({
     where: {
       id: {
-        not: currentUser.id // Exclude followed users + self
+        not: currentUser.id
       }
     },
     select: {

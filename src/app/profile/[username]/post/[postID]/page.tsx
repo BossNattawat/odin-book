@@ -60,7 +60,6 @@ function PostPage() {
         setPost(fetchedPost);
         setLikeCount(fetchedPost.likeCount);
 
-        // Optional: fetch like status for current user
         if (session?.user.username) {
           const likeRes = await axios.get(`/api/posts/is-liked/`, {
             params: {
@@ -80,7 +79,6 @@ function PostPage() {
     };
     fetchPost();
 
-    // Fetch comments (replies) for the post
     axios
       .get(`/api/replies/`, {
         params: {
@@ -103,7 +101,6 @@ function PostPage() {
         postId,
       });
 
-      // Optimistically update UI
       setLiked((prev) => !prev);
       setLikeCount((prev) => prev + (liked ? -1 : 1));
     } catch (error) {

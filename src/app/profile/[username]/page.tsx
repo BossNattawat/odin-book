@@ -44,8 +44,8 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>();
-  const [replies, setReplies] = useState<Comment[]>(); // Add replies state
-  const [likedPosts, setLikedPosts] = useState<Post[]>(); // Add liked posts state
+  const [replies, setReplies] = useState<Comment[]>();
+  const [likedPosts, setLikedPosts] = useState<Post[]>();
   const [activeTab, setActiveTab] = useState<string>("Posts");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -54,7 +54,6 @@ function Profile() {
 
   const { data: session, status } = useSession();
 
-  // Function to check if current user is following profile user
   async function checkIsFollowing(
     profileUsername: string,
     currentUsername: string
@@ -79,7 +78,6 @@ function Profile() {
         .get(`/api/user/${username}`)
         .then(async (res) => {
           setUserInfo(res.data.user);
-          // Use API to check if following
           if (
             session?.user?.username &&
             session.user.username !== username &&
@@ -103,16 +101,14 @@ function Profile() {
         .catch(() => {
           setError("Failed to fetch posts");
         });
-      // Fetch replies (if you have an endpoint)
       axios
         .get(`/api/replies/${username}`)
         .then((res) => {
           setReplies(res.data.replies);
         })
         .catch(() => {
-          setReplies([]); // fallback empty
+          setReplies([]);
         });
-      // Fetch liked posts
       axios
         .get(`/api/posts/like`, { params: { username } })
         .then((res) => {

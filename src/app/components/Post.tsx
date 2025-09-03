@@ -23,7 +23,7 @@ interface Post {
 
 interface PostProps {
   post: Post;
-  initiallyLiked?: boolean; // You can pass this from the parent later
+  initiallyLiked?: boolean;
 }
 
 function Post({ post, initiallyLiked = false }: PostProps) {
@@ -32,7 +32,6 @@ function Post({ post, initiallyLiked = false }: PostProps) {
   const [liked, setLiked] = useState<boolean>(initiallyLiked);
   const [likeCount, setLikeCount] = useState(post.likeCount);
 
-  // Sync liked state with initiallyLiked prop
   useEffect(() => {
     setLiked(initiallyLiked);
   }, [initiallyLiked]);
@@ -46,7 +45,6 @@ function Post({ post, initiallyLiked = false }: PostProps) {
 
       await axios.post("/api/posts/like", data);
 
-      // Optimistically toggle UI
       setLiked(!liked);
       setLikeCount((prev) => prev + (liked ? -1 : 1));
     } catch (error) {
@@ -69,7 +67,7 @@ function Post({ post, initiallyLiked = false }: PostProps) {
           <p className="text-gray-400">@{post.author.username}</p>
         </div>
       </div>
-      <Link href={`/profile/${post.author.username}/post/${post.id}`} className="">
+      <Link href={`/profile/${post.author.username}/post/${post.id}`}>
         <p className="text-lg">{post.content}</p>
       </Link>
       <div className="flex">

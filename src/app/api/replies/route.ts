@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "User not found" }, { status: 400 });
     }
 
-    // Create the comment
     const comment = await prisma.comment.create({
       data: {
         content,
@@ -32,7 +31,6 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Increment comment count on the post
     await prisma.post.update({
       where: { id: postId },
       data: {

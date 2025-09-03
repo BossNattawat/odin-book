@@ -16,7 +16,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "PostID is required" }, { status: 400 });
     }
 
-    // Find the user by username
     const user = await prisma.user.findUnique({
       where: { username },
       omit: {
@@ -28,7 +27,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Find the like for the specific post and user
     const like = await prisma.like.findFirst({
       where: {
         userId: user.id,
